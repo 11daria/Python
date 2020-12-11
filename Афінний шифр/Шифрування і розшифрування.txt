@@ -1,0 +1,178 @@
+import numpy as np
+s=np.array([[5],[6]])
+key_a = np.array([[1,2], [3,5]]) #1235 матриця
+print(key_a)
+print(s)
+
+
+w=round(np.linalg.det(key_a)) #детермінант
+print(w)
+
+a_ob=np.linalg.inv(key_a)*w #обернена матриця помножена на детермінант
+print(a_ob)
+
+
+a = ord('а')
+alph=''.join([chr(i) for i in range(a,a+32)])
+print(alph) #алфавіт
+lst_alph = list(alph) #список з алфавіту
+n=len(lst_alph) #довжина алфавіта
+print(n)
+
+def evklid(a,b):
+     r1=a
+     r2=b
+     s1=1
+     s2=0
+     t1=0
+     t2=1
+     r=r1%r2
+     while (r!=0):
+         q=r1//r2
+         s=s1-q*s2
+         t=t1-q*t2
+         r1=r2
+         r2=r
+         s1=s2
+         s2=s
+         t1=t2
+         t2=t
+         r=r1%r2
+     return r2,t2,s2
+func=evklid(w,n)  #w n
+print(func)
+
+w_ob=func[2] #обернене до w
+print("обернений елемент",w_ob)
+
+main_matrix=(a_ob*w_ob)%n #основна матриця
+print(main_matrix)
+
+d = {a: lst_alph[a] for a in range(32)}  #словник літер
+print(d)
+
+word2="отоларинголог"
+
+if len(word2)%len(key_a)==1:
+    word=word2+"а"
+else:
+    word=word2
+print(word)
+word1=list(word)
+print("word1",word1)
+
+len_main_matrix=len(main_matrix)
+print(len_main_matrix)
+
+
+word_k=[]
+for x in range(len(word)):
+    for key,value in d.items():
+        if word[x] in value:
+            k=key
+            word_k.append(k)
+
+print(word_k)
+
+ab=[word_k[i:i+len_main_matrix] for i in range(0, len(word_k), len_main_matrix)]
+print(ab)
+
+ab=np.array(ab)
+ab=ab.T
+print(ab)
+
+bigram=((key_a.dot(ab)+s)%n)
+print('bigram:',bigram)
+
+bigram=(bigram.T).tolist()
+print(bigram)
+
+
+shifr=[]
+for i in range(len(bigram)):
+    for j in range(len_main_matrix):
+        shifr.append(bigram[i][j])
+print(shifr)
+
+result=''
+for x in range(len(shifr)):
+    t=d[shifr[x]]
+    result=result+t
+print(result)
+
+
+#РОЗШИФРУВАННЯ
+
+word_k1=[]
+for x in range(len(result)):
+    for key,value in d.items():
+        if result[x] in value:
+            k=key
+            word_k1.append(k)
+print(word_k1)
+
+ab1=[word_k1[i:i+len_main_matrix] for i in range(0, len(word_k1), len_main_matrix)]
+print(ab1)
+
+ab1=np.array(ab1)
+ab1=ab1.T
+print(ab1)
+
+bigram1=(main_matrix.dot(ab1-s))%n
+print(bigram1)
+
+bigram1=(bigram1.T).tolist()
+print(bigram1)
+
+shifr1=[]
+for i in range(len(bigram1)):
+    for j in range(len_main_matrix):
+        if round(bigram1[i][j])==32:
+            shifr1.append(0)
+        else:
+            shifr1.append(round(bigram1[i][j]))
+print(shifr1)
+
+result1=''
+for x in range(len(shifr1)):
+    t=d[shifr1[x]]
+    result1=result1+t
+print(result1)
+
+
+#RESULT
+[[1 2]
+ [3 5]]
+[[5]
+ [6]]
+-1
+[[ 5. -2.]
+ [-3.  1.]]
+абвгдежзийклмнопрстуфхцчшщъыьэюя
+32
+(1, 0, -1)
+обернений елемент -1
+[[27.  2.]
+ [ 3. 31.]]
+{0: 'а', 1: 'б', 2: 'в', 3: 'г', 4: 'д', 5: 'е', 6: 'ж', 7: 'з', 8: 'и', 9: 'й', 10: 'к', 11: 'л', 12: 'м', 13: 'н', 14: 'о', 15: 'п', 16: 'р', 17: 'с', 18: 'т', 19: 'у', 20: 'ф', 21: 'х', 22: 'ц', 23: 'ч', 24: 'ш', 25: 'щ', 26: 'ъ', 27: 'ы', 28: 'ь', 29: 'э', 30: 'ю', 31: 'я'}
+отоларинголога
+word1 ['о', 'т', 'о', 'л', 'а', 'р', 'и', 'н', 'г', 'о', 'л', 'о', 'г', 'а']
+2
+[14, 18, 14, 11, 0, 16, 8, 13, 3, 14, 11, 14, 3, 0]
+[[14, 18], [14, 11], [0, 16], [8, 13], [3, 14], [11, 14], [3, 0]]
+[[14 14  0  8  3 11  3]
+ [18 11 16 13 14 14  0]]
+bigram: [[23  9  5  7  4 12  8]
+ [10  7 22 31 21 13 15]]
+[[23, 10], [9, 7], [5, 22], [7, 31], [4, 21], [12, 13], [8, 15]]
+[23, 10, 9, 7, 5, 22, 7, 31, 4, 21, 12, 13, 8, 15]
+чкйзецзядхмнип
+[23, 10, 9, 7, 5, 22, 7, 31, 4, 21, 12, 13, 8, 15]
+[[23, 10], [9, 7], [5, 22], [7, 31], [4, 21], [12, 13], [8, 15]]
+[[23  9  5  7  4 12  8]
+ [10  7 22 31 21 13 15]]
+[[14. 14. 32.  8.  3. 11.  3.]
+ [18. 11. 16. 13. 14. 14.  0.]]
+[[14.000000000000057, 17.99999999999997], [14.000000000000014, 10.999999999999993], [31.99999999999999, 16.0], [7.999999999999986, 13.0], [2.9999999999999867, 14.0], [11.000000000000028, 14.0], [3.000000000000014, 0.0]]
+[14, 18, 14, 11, 0, 16, 8, 13, 3, 14, 11, 14, 3, 0]
+отоларинголога
